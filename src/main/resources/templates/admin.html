@@ -30,6 +30,10 @@
                 <span th:text="${role.name}"></span>
             </span>
         </td>
+        <td>
+            <a th:href="@{/admin/edit/{id}(id=${user.id})}">Edit</a>
+            <a th:href="@{/admin/delete/{id}(id=${user.id})}">Delete</a>
+        </td>
     </tr>
     </tbody>
 </table>
@@ -41,6 +45,7 @@
         <a href="/user">User</a>
     </li>
 </ul>
+<a th:href="@{/admin/add}">Add User</a>
 <form th:action="@{/logout}" method="post">
     <input type="submit" value="Logout"/>
 </form>
