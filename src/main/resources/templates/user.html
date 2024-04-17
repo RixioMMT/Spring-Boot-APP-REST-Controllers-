@@ -3,46 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <title>List of Users</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
+    <style>
+        .first-container {
+            background-color: #1f1a1a;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: #f1e6e6;
+        }
+        .logout-button {
+            text-decoration: none;
+            color: #575454;
+        }
+        .second-container {
+            position: fixed;
+            left: 0;
+            top: 40px;
+            width: 200px;
+            height: 800px;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+        .menu-option {
+            color: #007bff;
+            margin-bottom: 10px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .menu-option:hover {
+            background-color: #007bff;
+            color: #fff;
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+        .admin-button {
+            text-decoration: none;
+        }
+        .user-button {
+            text-decoration: none;
+        }
+        .third-container {
+            position: fixed;
+            right: 0;
+            top: 40px;
+            width: 1336px;
+            height: 800px;
+            background-color: #e8e8e8;
+            padding: 20px;
+        }
+        .description-container {
+            border: 1px solid #ccc;
+        }
+        .description-container .bold-text {
+            font-weight: bold;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+        .table-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border: 1px solid #ccc;
+        }
+        .table thead {
+            border-top: 1px solid #ccc;
+        }
+        .table tbody tr:nth-child(odd) {
+            background-color: #4f1515;
+        }
+    </style>
 </head>
 <body>
-<h2>List of Users</h2>
 
-<table border="5">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Last Name</th>
-        <th>Age</th>
-        <th>Email</th>
-        <th>Roles</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="user : ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.name}"></td>
-        <td th:text="${user.lastName}"></td>
-        <td th:text="${user.age}"></td>
-        <td th:text="${user.email}"></td>
-        <td>
-            <span th:each="role : ${user.roles}">
-                <span th:text="${role.name}"></span>
-            </span>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<ul>
-    <li th:if="${session.isAdmin}">
-        <a href="/admin">Admin</a>
-    </li>
-    <li>
-        <a href="/user">User</a>
-    </li>
-</ul>
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Logout"/>
-</form>
+<div class="first-container">
+    <div class="email-container">
+        <span th:text="${userEmail}"></span> with roles:
+        <span th:each="role : ${userRoles}" th:text="'[' + ${role} + '] '"></span>
+    </div>
+    <a href="/logout" class="btn btn-link logout-button">Logout</a>
+</div>
+
+<div class="second-container">
+    <div class="menu-option" th:if="${session.isAdmin}">
+        <a href="/admin" class="btn btn-link admin-button" style="color: inherit;">Admin</a>
+    </div>
+    <div class="menu-option">
+        <a href="/user" class="btn btn-link user-button" style="color: inherit;">User</a>
+    </div>
+</div>
+
+<div class="third-container">
+    <h2>User Information Page</h2>
+    <div class="description-container">
+        <p class="bold-text">About User</p>
+    </div>
+    <div class="table-container">
+        <table class="table">
+            <thead class="thead">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Email</th>
+                <th>Roles</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}" th:if="${user.email eq userEmail}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.name}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td th:text="${user.age}"></td>
+                <td th:text="${user.email}"></td>
+                <td>
+                    <span th:each="role : ${user.roles}" th:text="'[' + ${role.name} + '] '"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

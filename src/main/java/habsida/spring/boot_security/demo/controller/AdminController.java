@@ -5,12 +5,18 @@ import habsida.spring.boot_security.demo.model.User;
 import habsida.spring.boot_security.demo.service.RoleService;
 import habsida.spring.boot_security.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -23,14 +29,14 @@ public class AdminController {
     @GetMapping
     public String printUsers(Model model) {
         model.addAttribute("users", userService.printAllUsers());
-        return "admin";
-    }
-    @GetMapping("/add")
-    public String addUserWeb(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+        Set<String> userRoles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+        model.addAttribute("userEmail", userEmail);
+        model.addAttribute("userRoles", userRoles);
         List<Role> allRoles = roleService.getAllRoles();
         model.addAttribute("allRoles", allRoles);
-        model.addAttribute("user", new User());
-        return "add";
+        return "admin";
     }
     @PostMapping("/add")
     public String addUser(@ModelAttribute("user") User user, @RequestParam("roles") List<Long> roleIds) {
@@ -41,23 +47,15 @@ public class AdminController {
         userService.addUser(user);
         return "redirect:/admin";
     }
-    @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUser(id);
+    @PostMapping("/delete")
+    public String deleteUser(@RequestParam("id") String userIdString) {
+        Long userId = Long.valueOf(userIdString);
+        userService.deleteUser(userId);
         return "redirect:/admin";
-    }
-    @GetMapping("/edit/{id}")
-    public String editUserWeb(@PathVariable("id") Long id, Model model) {
-        User user = userService.getUserById(id);
-        List<Role> allRoles = roleService.getAllRoles();
-        model.addAttribute("allRoles", allRoles);
-        model.addAttribute("user", user);
-        return "edit";
     }
     @PostMapping("/edit")
     public String editUser(@ModelAttribute("user") User user, @RequestParam("roles") List<Long> roleIds) {
         userService.editUser(user, roleIds);
         return "redirect:/admin";
     }
-
 }
