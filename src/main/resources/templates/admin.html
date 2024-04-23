@@ -66,6 +66,8 @@
             background-color: #ffffff;
             padding: 30px;
             border: 1px solid #ccc;
+            max-height: 500px;
+            overflow-y: auto;
         }
         .table thead {
             border-top: 1px solid #ccc;
@@ -129,8 +131,7 @@
 
 <div class="first-container">
     <div class="email-container">
-        <span th:text="${userEmail}"></span> with roles:
-        <span th:each="role : ${userRoles}" th:text="'[' + ${role} + '] '"></span>
+        <span id="userEmail"></span> with roles: <span id="userRoles"></span>
     </div>
     <a href="/logout" class="btn btn-link logout-button">Logout</a>
 </div>
@@ -174,28 +175,6 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.id}"></td>
-                        <td th:text="${user.name}"></td>
-                        <td th:text="${user.lastName}"></td>
-                        <td th:text="${user.age}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td>
-                            <span th:each="role : ${user.roles}" th:text="'[' + ${role.name} + '] '"></span>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-primary"
-                                    th:attr="onclick='openModal(\'/admin/edit\', \'' + ${user.id} + '\', \'' + ${user.age} + '\', \'' + ${user.name} + '\', \'' + ${user.lastName} + '\', \'' + ${user.email} + '\')'">
-                                Edit
-                            </button>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger"
-                                    th:attr="onclick='openModal(\'/admin/delete\', \'' + ${user.id} + '\', \'' + ${user.age} + '\', \'' + ${user.name} + '\', \'' + ${user.lastName} + '\', \'' + ${user.email} + '\')'">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -205,7 +184,7 @@
                 <p class="bold-text">Add new user</p>
             </div>
             <div class="form-container">
-                <form id="add-user-form" action="admin/add" method="post">
+                <form id="add-user-form">
                     <div class="form-group">
                         <label for="name">First Name</label>
                         <input type="text" class="form-control" id="name" name="name" required>
@@ -228,9 +207,7 @@
                     </div>
                     <div class="form-group">
                         <label for="roles">Role</label>
-                        <select multiple class="form-control" id="roles" name="roles" required>
-                            <option th:each="role : ${allRoles}" th:value="${role.id}" th:text="${role.name}"></option>
-                        </select>
+                        <select multiple class="form-control" id="roles" name="roles" required></select>
                     </div>
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                     <button type="submit" class="btn btn-success">Add new user</button>
@@ -243,7 +220,7 @@
 <div id="confirmDeleteModal" class="modal">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="/admin/delete" id="deleteForm" method="post">
+            <form id="deleteForm">
                 <input type="hidden" id="userIdInput" name="id" value="${user.id}">
                 <div class="modal-header">
                     <h4 class="modal-title">Delete User</h4>
@@ -264,14 +241,12 @@
                     <p class="below-center-text"> </p>
                     <div class="form-group">
                         <label class="above-center-text" for="deleteRoles">User Roles:</label>
-                        <select multiple class="form-control-delete" id="deleteRoles" name="roles" readonly>
-                            <option th:each="role : ${allRoles}" th:value="${role.id}" th:text="${role.name}"></option>
-                        </select>
+                        <select multiple class="form-control-delete" id="deleteRoles" name="roles" readonly=""></select>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 </div>
             </form>
@@ -282,7 +257,7 @@
 <div id="confirmEditModal" class="modal">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="/admin/edit" id="editForm" method="post">
+            <form id="editForm">
                 <input type="hidden" id="editUserIdInput" name="id" value="">
                 <div class="modal-header">
                     <h4 class="modal-title">Edit User</h4>
@@ -313,9 +288,7 @@
                     </div>
                     <div class="above-center-text">
                         <label for="editRoles">Role</label>
-                        <select multiple class="edit-center-text" id="editRoles" name="roles" required>
-                            <option th:each="role : ${allRoles}" th:value="${role.id}" th:text="${role.name}"></option>
-                        </select>
+                        <select multiple class="edit-center-text" id="editRoles" name="roles" required=""></select>
                     </div>
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 </div>
@@ -330,7 +303,9 @@
 
 
 <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
 <script>
+
     function openModal(url, userId, userAge, userName, userLastName, dUserEmail) {
         if (url.includes('/admin/delete')) {
             const confirmDeleteModal = document.getElementById('confirmDeleteModal');
@@ -364,6 +339,7 @@
             confirmEditModal.style.display = 'block';
         }
     }
+
     function closeModal() {
         const confirmDeleteModal = document.getElementById('confirmDeleteModal');
         const confirmEditModal = document.getElementById('confirmEditModal');
@@ -371,12 +347,238 @@
         confirmEditModal.style.display = 'none';
 
     }
+
     document.addEventListener('DOMContentLoaded', function () {
         const closeButton = document.querySelector('#confirmDeleteModal .close');
         const editCloseButton = document.querySelector('#confirmEditModal .close');
         closeButton.addEventListener('click', closeModal);
         editCloseButton.addEventListener('click', closeModal);
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/api/admin')
+            .then(response => response.json())
+            .then(data => {
+                const currentUser = data.currentUser;
+                const userEmail = currentUser.email;
+                const userRoles = currentUser.roles.map(role => '[' + role.name + ']').join(' ');
+                document.getElementById('userEmail').textContent = userEmail;
+                document.getElementById('userRoles').textContent = userRoles;
+                const allUsers = data.allUsers;
+                allUsers.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('row-id', user.id);
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.age}</td>
+                        <td>${user.email}</td>
+                        <td>${user.roles.map(role => '[' + role.name + ']').join(' ')}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary edit-button">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger delete-button">Delete</button>
+                        </td>
+                    `;
+                    row.querySelector('.edit-button').addEventListener('click', function() {
+                        openModal('/admin/edit', user.id, user.age, user.name, user.lastName, user.email);
+                    });
+                    row.querySelector('.delete-button').addEventListener('click', function() {
+                        openModal('/admin/delete', user.id, user.age, user.name, user.lastName, user.email);
+                    });
+                    document.querySelector('.table-container tbody').appendChild(row);
+                });
+                const allRoles = data.allRoles;
+                const rolesDropdown = document.getElementById('roles');
+                const deleteRoles = document.getElementById('deleteRoles');
+                const editRoles = document.getElementById('editRoles');
+                allRoles.forEach(role => {
+                    const option1 = document.createElement('option');
+                    const option2 = document.createElement('option');
+                    const option3 = document.createElement('option');
+                    option1.value = role.id;
+                    option1.textContent = role.name;
+                    option2.value = role.id;
+                    option2.textContent = role.name;
+                    option3.value = role.id;
+                    option3.textContent = role.name;
+                    rolesDropdown.appendChild(option1);
+                    deleteRoles.appendChild(option2);
+                    editRoles.appendChild(option3)
+                });
+            });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const addUserForm = document.getElementById('add-user-form');
+        addUserForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
+            const formData = {
+                name: document.getElementById('name').value,
+                lastName: document.getElementById('lastName').value,
+                age: document.getElementById('age').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                roles: Array.from(document.getElementById('roles').selectedOptions).map(option => {
+                    return { id: option.value };
+                })
+            };
+            fetch('/api/admin/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        response.json().then(data => {
+                            alert('User added successfully');
+                            updateUserTableAdd(data);
+                        });
+                    } else {
+                        alert('Failed to add user');
+                    }
+                })
+        });
+    });
+
+    function deleteUser(userId, csrfToken) {
+        fetch(`/api/admin/delete/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    response.text().then(message => {
+                        alert(message);
+                        updateUserTableDelete(userId)
+                    });
+                } else {
+                    alert('Failed to delete user');
+                }
+            })
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteForm = document.getElementById('deleteForm');
+        deleteForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
+            const userId = document.getElementById('userIdInput').value;
+            deleteUser(userId, csrfToken);
+            closeModal();
+        });
+    });
+
+    function editUser(userId, userData, csrfToken) {
+        fetch(`/api/admin/edit/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify(userData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    response.json().then(data => {
+                        alert('User updated successfully');
+                        updateUserTableEdit(data);
+                    });
+                } else {
+                    alert('Failed to edit user');
+                }
+            })
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const editForm = document.getElementById('editForm');
+        editForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
+            const userId = document.getElementById('editUserIdInput').value;
+            const userData = {
+                name: document.getElementById('editName').value,
+                lastName: document.getElementById('editLastName').value,
+                age: document.getElementById('editAge').value,
+                email: document.getElementById('editEmail').value,
+                password: document.getElementById('editPassword').value,
+                roles: Array.from(document.getElementById('editRoles').selectedOptions).map(option => {
+                    return { id: option.value };
+                })
+            };
+            editUser(userId, userData, csrfToken);
+            closeModal();
+        });
+    });
+
+    function updateUserTableAdd(user) {
+        const tableBody = document.querySelector('.table-container tbody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.name}</td>
+            <td>${user.lastName}</td>
+            <td>${user.age}</td>
+            <td>${user.email}</td>
+            <td>${user.roles.map(role => '[' + role.name + ']').join(' ')}</td>
+            <td>
+                <button type="button" class="btn btn-primary edit-button">Edit</button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger delete-button">Delete</button>
+            </td>
+        `;
+        newRow.querySelector('.edit-button').addEventListener('click', function() {
+            openModal('/admin/edit', user.id, user.age, user.name, user.lastName, user.email);
+        });
+        newRow.querySelector('.delete-button').addEventListener('click', function() {
+            openModal('/admin/delete', user.id, user.age, user.name, user.lastName, user.email);
+        });
+        tableBody.appendChild(newRow);
+    }
+
+    function updateUserTableDelete(userId) {
+        const userRow = document.querySelector(`[row-id="${userId}"]`);
+        userRow.remove();
+    }
+
+    function updateUserTableEdit(user) {
+        const userRow = document.querySelector(`[row-id="${user.id}"]`);
+        userRow.remove();
+        const tableBody = document.querySelector('.table-container tbody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.name}</td>
+            <td>${user.lastName}</td>
+            <td>${user.age}</td>
+            <td>${user.email}</td>
+            <td>${user.roles.map(role => '[' + role.name + ']').join(' ')}</td>
+            <td>
+                <button type="button" class="btn btn-primary edit-button">Edit</button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger delete-button">Delete</button>
+            </td>
+        `;
+        newRow.querySelector('.edit-button').addEventListener('click', function() {
+            openModal('/admin/edit', user.id, user.age, user.name, user.lastName, user.email);
+        });
+        newRow.querySelector('.delete-button').addEventListener('click', function() {
+            openModal('/admin/delete', user.id, user.age, user.name, user.lastName, user.email);
+        });
+        tableBody.appendChild(newRow);
+    }
+
 </script>
+
 </body>
 </html>

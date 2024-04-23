@@ -1,5 +1,6 @@
 package habsida.spring.boot_security.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.*;
 import java.util.List;
@@ -12,6 +13,7 @@ public class Role implements GrantedAuthority {
     private Long id;
     @Column(name = "name")
     private String name;
+    @JsonBackReference
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
     public Role() {

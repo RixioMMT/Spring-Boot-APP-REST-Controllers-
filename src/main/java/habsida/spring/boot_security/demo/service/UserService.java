@@ -10,5 +10,5 @@ public interface UserService {
     public void addUser(User user);
     public void deleteUser(Long id);
     public User getUserById(Long id);
-    public void editUser(User user, List<Long> roleIds);
+    public void editUser(User user);
 }

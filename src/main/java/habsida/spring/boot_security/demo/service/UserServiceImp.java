@@ -40,7 +40,7 @@ public class UserServiceImp implements UserService{
         return userRepository.findUserById(id);
     }
     @Override
-    public void editUser(User user, List<Long> roleIds) {
+    public void editUser(User user) {
         String encryptedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encryptedPassword);
         userRepository.save(user);
