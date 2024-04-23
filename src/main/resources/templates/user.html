@@ -127,13 +127,6 @@
                 document.getElementById('userEmail').textContent = user.email;
                 const roles = user.roles.map(role => '[' + role.name + ']').join(' ');
                 document.getElementById('userRoles').textContent = roles;
-            })
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        fetch('/api/user')
-            .then(response => response.json())
-            .then(user => {
                 const userData = `
                     <tr>
                         <td>${user.id}</td>

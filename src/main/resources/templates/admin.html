@@ -391,7 +391,7 @@
                     document.querySelector('.table-container tbody').appendChild(row);
                 });
                 const allRoles = data.allRoles;
-                const rolesDropdown = document.getElementById('roles');
+                const addRoles = document.getElementById('roles');
                 const deleteRoles = document.getElementById('deleteRoles');
                 const editRoles = document.getElementById('editRoles');
                 allRoles.forEach(role => {
@@ -404,7 +404,7 @@
                     option2.textContent = role.name;
                     option3.value = role.id;
                     option3.textContent = role.name;
-                    rolesDropdown.appendChild(option1);
+                    addRoles.appendChild(option1);
                     deleteRoles.appendChild(option2);
                     editRoles.appendChild(option3)
                 });
@@ -522,6 +522,7 @@
     function updateUserTableAdd(user) {
         const tableBody = document.querySelector('.table-container tbody');
         const newRow = document.createElement('tr');
+        newRow.setAttribute('row-id', user.id);
         newRow.innerHTML = `
             <td>${user.id}</td>
             <td>${user.name}</td>
@@ -555,6 +556,7 @@
         userRow.remove();
         const tableBody = document.querySelector('.table-container tbody');
         const newRow = document.createElement('tr');
+        newRow.setAttribute('row-id', user.id);
         newRow.innerHTML = `
             <td>${user.id}</td>
             <td>${user.name}</td>
