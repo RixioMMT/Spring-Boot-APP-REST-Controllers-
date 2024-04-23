@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>List of Users</title>
@@ -79,8 +79,7 @@
 
 <div class="first-container">
     <div class="email-container">
-        <span th:text="${userEmail}"></span> with roles:
-        <span th:each="role : ${userRoles}" th:text="'[' + ${role} + '] '"></span>
+        <span id="userEmail"></span> with roles: <span id="userRoles"></span>
     </div>
     <a href="/logout" class="btn btn-link logout-button">Logout</a>
 </div>
@@ -112,22 +111,44 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user : ${users}" th:if="${user.email eq userEmail}">
-                <td th:text="${user.id}"></td>
-                <td th:text="${user.name}"></td>
-                <td th:text="${user.lastName}"></td>
-                <td th:text="${user.age}"></td>
-                <td th:text="${user.email}"></td>
-                <td>
-                    <span th:each="role : ${user.roles}" th:text="'[' + ${role.name} + '] '"></span>
-                </td>
-            </tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/api/user')
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('userEmail').textContent = user.email;
+                const roles = user.roles.map(role => '[' + role.name + ']').join(' ');
+                document.getElementById('userRoles').textContent = roles;
+            })
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/api/user')
+            .then(response => response.json())
+            .then(user => {
+                const userData = `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.age}</td>
+                        <td>${user.email}</td>
+                        <td>${user.roles.map(role => '[' + role.name + ']').join(' ')}</td>
+                    </tr>
+                `;
+                document.querySelector('.table-container tbody').innerHTML = userData;
+            })
+    });
+
+</script>
 
 </body>
 </html>
