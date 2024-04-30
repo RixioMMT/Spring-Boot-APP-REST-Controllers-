@@ -439,6 +439,7 @@
                         response.json().then(data => {
                             alert('User added successfully');
                             updateUserTableAdd(data);
+                            window.location.href = '/admin';
                         });
                     } else {
                         alert('Failed to add user');
